@@ -20,22 +20,22 @@ bool Pacman::collision(Map& map, Vector2i target)
 	int x = pos.x + size.x / 2;
 	int y = pos.y + size.y / 2;
 
-	int j = x / map.getSize().x;
-	int i = y / map.getSize().y;
+	int j = x / 27;
+	int i = y / 27;
 
-	if (x >= ((int)map.getSize().x * j + (int)map.getSize().x / 2 - 1) && x <= ((int)map.getSize().x * j + (int)map.getSize().x / 2 + 1) 
-		&& y >= ((int)map.getSize().y * i + (int)map.getSize().y / 2 - 1) && y <= ((int)map.getSize().y * i + (int)map.getSize().y / 2 + 1))
+	if (x >= ((int)27 * j + (int)27 / 2 - 1) && x <= ((int)27 * j + (int)27 / 2 + 1) 
+		&& y >= ((int)27 * i + (int)27 / 2 - 1) && y <= ((int)27 * i + (int)27 / 2 + 1))
 	{
 		if (map.getField(i, j) == '2' && delta.x < 0)
 		{
-			pos.x += 27 * map.getSize().x;
-			sprite.move(Vector(27 * map.getSize().x, 0));
+			pos.x += 27 * 27;
+			sprite.move(Vector(27 * 27, 0));
 			return false;
 		}
 		if (map.getField(i, j) == '3' && delta.x > 0)
 		{
-			pos.x -= 27 * map.getSize().x;
-			sprite.move(Vector(-27 * map.getSize().x, 0));
+			pos.x -= 27 * 27;
+			sprite.move(Vector(-27 * 27, 0));
 			return false;
 		}
 		
@@ -134,10 +134,10 @@ void Pacman::drawHealthPoint(RenderWindow& window)
 	}
 }
 
-void Pacman::damage(Map& map) 
+void Pacman::damage() 
 { 
 	healthPoint--; 
-	pos = Vector(14 * map.getSize().x, 23 * map.getSize().y);
+	pos = Vector(14 * 27, 23 * 27);
 	dir = DIRECTION::stay;
 	sprite.setPosition(pos);
 	currentFrame = 2;
@@ -146,7 +146,7 @@ void Pacman::damage(Map& map)
 bool Pacman::eatFood(Map& map)
 {
 	sf::Vector2i cell;
-	cell = getCell(map);
+	cell = getCell();
 	if (map.getField(cell.x, cell.y) == ' ')
 	{
 		score += 10;

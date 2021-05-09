@@ -3,6 +3,11 @@
 #include "Pacman.h"
 #include "Enemy.h"
 
+enum class GAME_MODE
+{
+	eatingGhosts,
+	normal
+};
 
 struct Targets
 {
@@ -43,6 +48,7 @@ private:
 
 	Targets targets;
 	int countEaten = 0;
+	GAME_MODE gameMode;
 public:
 	Game(int spriteSize, int mapHeight, int mapWidth);
 	void renderScene();

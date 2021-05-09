@@ -21,6 +21,4 @@ public:
 	void drawMap(sf::RenderWindow& window);
 	char getField(int i, int j) const { return map[i][j]; }
 	void setField(char field, int i, int j) { map[i][j] = field; }
-	Vector getSize() const { return size; }
-	//sf::Vector2i getCell(Vector pos) const;
 };

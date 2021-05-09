@@ -32,13 +32,13 @@ void Entity::changeDelta()
 	}
 }
 
-Vector2i Entity::getCell(const Map& map)
+Vector2i Entity::getCell()
 {
 	int x = pos.x + size.x / 2;
 	int y = pos.y + size.y / 2;
 
-	int j = x / map.getSize().x;
-	int i = y / map.getSize().y;
+	int j = x / 27;
+	int i = y / 27;
 
 	return Vector2i(i, j);
 }

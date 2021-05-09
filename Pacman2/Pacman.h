@@ -11,7 +11,7 @@ public:
 	bool collision(Map& map, sf::Vector2i target = sf::Vector2i(0, 0)) final;
 	int getScore() { return score; }
 	void drawHealthPoint(sf::RenderWindow& window);
-	void damage(Map& map);
+	void damage();
 	int getHP() { return healthPoint; }
 	DIRECTION getDir() { return dir; }
 	bool eatFood(Map& map);

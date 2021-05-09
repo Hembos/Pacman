@@ -44,20 +44,27 @@ Enemy::Enemy(Vector pos, float speed, const sf::Texture& texture, Vector size, D
 
 void Enemy::update(float time, Map& map, Vector2i target)
 {
-	changeFrame(time);
-
-	for (int i = 0; i < time; i++)
+	
+	if (mode != BEHAVIOR_MODE::house)
 	{
-		
-		collision(map, target);
+		if (mode == BEHAVIOR_MODE::leaveHouse && getCell().y == 10)
+		{
+			mode = BEHAVIOR_MODE::pursuit;
+		}
+		else if (mode == BEHAVIOR_MODE::leaveHouse)
+		{
+			target = Vector2i(0, 0);
+		}
 
-		changeDelta();
+		changeFrame(time);
 
-		move(time);
+		for (int i = 0; i < time; i++)
+		{
+			collision(map, target);
+			changeDelta();
+			move(time);
+		}
 	}
-
-	sf::Vector2i cell;
-	cell = getCell(map);
 }
 
 int length(Vector2i posP, Vector2i posB)
@@ -70,26 +77,26 @@ bool Enemy::collision(Map& map, Vector2i target)
 	int x = pos.x + size.x / 2;
 	int y = pos.y + size.y / 2;
 
-	int j = x / map.getSize().x;
-	int i = y / map.getSize().y;
+	int j = x / 27;
+	int i = y / 27;
 
 	if (map.getField(i, j) == '2' && delta.x < 0)
 	{
 		nextCell = Vector2i(26, 14);
-		pos.x += 27 * map.getSize().x;
-		sprite.move(Vector(27 * map.getSize().x, 0));
+		pos.x += 27 * 27;
+		sprite.move(Vector(27 * 27, 0));
 		return false;
 	}
 	if (map.getField(i, j) == '3' && delta.x > 0)
 	{
 		nextCell = Vector2i(1, 14);
-		pos.x -= 27 * map.getSize().x;
-		sprite.move(Vector(-27 * map.getSize().x, 0));
+		pos.x -= 27 * 27;
+		sprite.move(Vector(-27 * 27, 0));
 		return false;
 	}
 
-	if (x == (((int)map.getSize().x * j + (int)map.getSize().x / 2))
-		&& y == ((int)map.getSize().y * i + (int)map.getSize().y / 2)
+	if (x == (((int)27 * j + (int)27 / 2))
+		&& y == ((int)27 * i + (int)27 / 2)
 		&& nextCell == Vector2i(j, i))
 	{
 		dir = nextDir;
@@ -120,22 +127,26 @@ bool Enemy::collision(Map& map, Vector2i target)
 		int min = INT32_MAX;
 		DIRECTION tmp = dir;
 
-		if (dir != DIRECTION::left && map.getField(i, j + 1) != '1' && map.getField(i, j + 1) != '5' && min >= length(Vector2i(i, j + 1), target))
+		if (dir != DIRECTION::left && map.getField(i, j + 1) != '1' && 
+			(map.getField(i, j + 1) != '5' || mode == BEHAVIOR_MODE::leaveHouse) && min >= length(Vector2i(i, j + 1), target))
 		{
 			min = length(Vector2i(i, j + 1), target);
 			tmp = DIRECTION::right;
 		}
-		if (dir != DIRECTION::right && map.getField(i, j - 1) != '1' && map.getField(i, j - 1) != '5' && min >= length(Vector2i(i, j - 1), target))
+		if (dir != DIRECTION::right && map.getField(i, j - 1) != '1' && (map.getField(i, j - 1) != '5' || mode == BEHAVIOR_MODE::leaveHouse)
+			&& min >= length(Vector2i(i, j - 1), target))
 		{
 			min = length(Vector2i(i, j - 1), target);
 			tmp = DIRECTION::left;
 		}
-		if (dir != DIRECTION::up && map.getField(i + 1, j) != '1' && map.getField(i + 1, j) != '5' && min >= length(Vector2i(i + 1, j), target))
+		if (dir != DIRECTION::up && map.getField(i + 1, j) != '1' && (map.getField(i + 1, j) != '5' || mode == BEHAVIOR_MODE::leaveHouse)
+			&& min >= length(Vector2i(i + 1, j), target))
 		{
 			min = length(Vector2i(i + 1, j), target);
 			tmp = DIRECTION::down;
 		}
-		if (dir != DIRECTION::down && map.getField(i - 1, j) != '1' && map.getField(i - 1, j) != '5' && min >= length(Vector2i(i - 1, j), target))
+		if (dir != DIRECTION::down && map.getField(i - 1, j) != '1' && (map.getField(i - 1, j) != '5' || mode == BEHAVIOR_MODE::leaveHouse)
+			&& min >= length(Vector2i(i - 1, j), target))
 		{
 			min = length(Vector2i(i - 1, j), target);
 			tmp = DIRECTION::up;
@@ -159,7 +170,6 @@ void Enemy::beginState(const Texture& texture)
 	pos = beginPos;
 	nextCell = beginNextCell;
 	sprite.setPosition(pos);
-	mode = BEHAVIOR_MODE::pursuit;
 	dir = beginDir;
 	nextDir = beginDir;
 	sprite.setTexture(texture);

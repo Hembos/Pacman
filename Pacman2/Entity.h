@@ -31,6 +31,6 @@ public:
 	const Vector& getSize() const { return size; }
 	void changeDelta();
 	virtual void move(float time) = 0;
-	sf::Vector2i getCell(const Map& map);
+	sf::Vector2i getCell();
 	void setTexture(const sf::Texture& texture) { sprite.setTexture(texture); }
 };

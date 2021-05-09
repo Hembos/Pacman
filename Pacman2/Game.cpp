@@ -18,21 +18,23 @@ Game::Game(int spriteSize, int mapHeight, int mapWidth)
 	pacman = new Pacman(Vector2f(spriteSize * 14, spriteSize * 23), 0.2, pacmanTexture, Vector2f(spriteSize, spriteSize));
 
 	blinkyTexture.loadFromFile("src/Blinky.png");
-	blinky = new Enemy(Vector2f(spriteSize, spriteSize), 0.18, blinkyTexture, Vector2f(spriteSize, spriteSize), DIRECTION::down, Vector2i(1, 2), BEHAVIOR_MODE::pursuit);
+	blinky = new Enemy(Vector2f(spriteSize * 14, spriteSize * 11), 0.18, blinkyTexture, Vector2f(spriteSize, spriteSize), DIRECTION::left, Vector2i(13, 11), BEHAVIOR_MODE::pursuit);
 
 	pinkyTexture.loadFromFile("src/Pinky.png");
-	pinky = new Enemy(Vector2f(spriteSize * 14, spriteSize * 11), 0.17, pinkyTexture, Vector2f(spriteSize, spriteSize), DIRECTION::left, Vector2i(13, 11), BEHAVIOR_MODE::house);
+	pinky = new Enemy(Vector2f(spriteSize * 14, spriteSize * 14), 0.17, pinkyTexture, Vector2f(spriteSize, spriteSize), DIRECTION::up, Vector2i(14, 13), BEHAVIOR_MODE::house);
 
 	clydeTexture.loadFromFile("src/Clyde.png");
-	clyde = new Enemy(Vector2f(spriteSize * 2, spriteSize), 0.17, clydeTexture, Vector2f(spriteSize, spriteSize), DIRECTION::right, Vector2i(3, 1), BEHAVIOR_MODE::house);
+	clyde = new Enemy(Vector2f(spriteSize * 13, spriteSize * 14), 0.17, clydeTexture, Vector2f(spriteSize, spriteSize), DIRECTION::up, Vector2i(13, 13), BEHAVIOR_MODE::house);
 
 	inkyTexture.loadFromFile("src/Inky.png");
-	inky = new Enemy(Vector2f(spriteSize * 3, spriteSize), 0.17, inkyTexture, Vector2f(spriteSize, spriteSize), DIRECTION::left, Vector2i(2, 1), BEHAVIOR_MODE::house);
+	inky = new Enemy(Vector2f(spriteSize * 15, spriteSize * 14), 0.17, inkyTexture, Vector2f(spriteSize, spriteSize), DIRECTION::up, Vector2i(15, 13), BEHAVIOR_MODE::house);
 
 	numbersTexture.loadFromFile("src/Numbers.png");
 	numbersSprite.setTexture(numbersTexture);
 
 	frightTexture.loadFromFile("src/Fright.png");
+
+	gameMode = GAME_MODE::normal;
 }
 
 void Game::renderScene()
@@ -80,10 +82,10 @@ void Game::renderScene()
 
 void Game::giveTargets()
 {
-	targets.targetBlinky = pacman->getCell(*map);
-	targets.targetPinky = pacman->getCell(*map);
-	targets.targetClyde = pacman->getCell(*map);
-	targets.targetInky = pacman->getCell(*map);
+	targets.targetBlinky = pacman->getCell();
+	targets.targetPinky = pacman->getCell();
+	targets.targetClyde = pacman->getCell();
+	targets.targetInky = pacman->getCell();
 	DIRECTION dir = pacman->getDir();
 
 	switch (dir)
@@ -108,16 +110,16 @@ void Game::giveTargets()
 		break;
 	}
 
-	targets.targetInky.x = abs(blinky->getCell(*map).x + 2 * (blinky->getCell(*map).x - targets.targetInky.x));
-	targets.targetInky.y = abs(blinky->getCell(*map).y + 2 * (blinky->getCell(*map).y - targets.targetInky.y));
+	targets.targetInky.x = abs(blinky->getCell().x + 2 * (blinky->getCell().x - targets.targetInky.x));
+	targets.targetInky.y = abs(blinky->getCell().y + 2 * (blinky->getCell().y - targets.targetInky.y));
 
-	if (sqrt(pow(targets.targetClyde.x - clyde->getCell(*map).x, 2) + pow(targets.targetClyde.y - clyde->getCell(*map).y, 2)) <= 8 || clyde->getMode() == BEHAVIOR_MODE::fright)
+	if (sqrt(pow(targets.targetClyde.x - clyde->getCell().x, 2) + pow(targets.targetClyde.y - clyde->getCell().y, 2)) <= 8 || clyde->getMode() == BEHAVIOR_MODE::fright)
 	{
 		targets.targetClyde = Vector2i(32, 0);
 	}
 	if (blinky->getMode() == BEHAVIOR_MODE::fright)
 	{
-		targets.targetBlinky = Vector2i(0, 28);
+		targets.targetBlinky = Vector2i(0, 27);
 	}
 	if (pinky->getMode() == BEHAVIOR_MODE::fright)
 	{
@@ -125,23 +127,28 @@ void Game::giveTargets()
 	}
 	if (inky->getMode() == BEHAVIOR_MODE::fright)
 	{
-		targets.targetInky = Vector2i(32, 28);
+		targets.targetInky = Vector2i(32, 27);
 	}
 }
 
 void Game::setBeginGame()
 {
-	pacman->damage(*map);
+	pacman->damage();
 	blinky->beginState(blinkyTexture);
-	pinky->beginState(blinkyTexture);
-	clyde->beginState(blinkyTexture);
-	inky->beginState(blinkyTexture);
+	pinky->beginState(pinkyTexture);
+	clyde->beginState(clydeTexture);
+	inky->beginState(inkyTexture);
+	blinky->setMode(BEHAVIOR_MODE::pursuit);
+	pinky->setMode(BEHAVIOR_MODE::house);
+	clyde->setMode(BEHAVIOR_MODE::house);
+	inky->setMode(BEHAVIOR_MODE::house);
 	countEaten = 0;
+	pastTime = 0;
 }
 
-bool checkCollEntities(Enemy& enemy, Pacman& pacman, const Map& map, int& countEaten, const Texture& texture)
+bool checkCollEntities(Enemy& enemy, Pacman& pacman,  int& countEaten, const Texture& texture)
 {
-	if (enemy.getCell(map) == pacman.getCell(map))
+	if (enemy.getCell() == pacman.getCell())
 	{
 		if (enemy.getMode() == BEHAVIOR_MODE::fright)
 		{
@@ -162,6 +169,19 @@ void Game::updateEntities(float pt)
 {
 	pacman->update(pt, *map);
 
+	if (pastTime >= 2 && pinky->getMode() == BEHAVIOR_MODE::house)
+	{
+		pinky->setMode(BEHAVIOR_MODE::leaveHouse);
+	}
+	if (pastTime >= 4 && clyde->getMode() == BEHAVIOR_MODE::house)
+	{
+		clyde->setMode(BEHAVIOR_MODE::leaveHouse);
+	}
+	if (pastTime >= 6 && inky->getMode() == BEHAVIOR_MODE::house)
+	{
+		inky->setMode(BEHAVIOR_MODE::leaveHouse);
+	}
+
 	if (pacman->eatFood(*map))
 	{
 		blinky->setMode(BEHAVIOR_MODE::fright);
@@ -174,13 +194,14 @@ void Game::updateEntities(float pt)
 		inky->setTexture(frightTexture);
 		countEaten = 0;
 		elapsedTimeEating = 3;
+		gameMode = GAME_MODE::eatingGhosts;
 	}
 
 	if (elapsedTimeEating > 0)
 	{
 		elapsedTimeEating -= time.asSeconds();
 	}
-	else
+	else if (gameMode == GAME_MODE::eatingGhosts)
 	{
 		blinky->setMode(BEHAVIOR_MODE::pursuit);
 		pinky->setMode(BEHAVIOR_MODE::pursuit);
@@ -191,6 +212,7 @@ void Game::updateEntities(float pt)
 		clyde->setTexture(clydeTexture);
 		inky->setTexture(inkyTexture);
 		elapsedTimeEating = 0;
+		gameMode = GAME_MODE::normal;
 	}
 
 	giveTargets();
@@ -200,10 +222,10 @@ void Game::updateEntities(float pt)
 	clyde->update(pt, *map, targets.targetClyde);
 	inky->update(pt, *map, targets.targetInky);
 	
-	if (checkCollEntities(*blinky, *pacman, *map, countEaten, blinkyTexture) == true
-		|| checkCollEntities(*pinky, *pacman, *map, countEaten, pinkyTexture) == true
-		|| checkCollEntities(*clyde, *pacman, *map, countEaten, clydeTexture) == true
-		|| checkCollEntities(*inky, *pacman, *map, countEaten, inkyTexture) == true)
+	if (checkCollEntities(*blinky, *pacman, countEaten, blinkyTexture) == true
+		|| checkCollEntities(*pinky, *pacman, countEaten, pinkyTexture) == true
+		|| checkCollEntities(*clyde, *pacman, countEaten, clydeTexture) == true
+		|| checkCollEntities(*inky, *pacman, countEaten, inkyTexture) == true)
 	{
 		setBeginGame();
 		return;

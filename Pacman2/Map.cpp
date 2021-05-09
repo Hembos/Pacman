@@ -81,14 +81,3 @@ void Map::drawMap(RenderWindow& window)
 		}
 	}
 }
-
-//Vector2i Map::getCell(Vector pos) const
-//{
-//	int x = pos.x + size.x / 2;
-//	int y = pos.y + size.y / 2;
-//
-//	int j = x / size.x;
-//	int i = y / size.y;
-//
-//	return Vector2i(i, j);
-//}
