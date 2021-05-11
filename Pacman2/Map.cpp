@@ -9,11 +9,14 @@ Map::Map(int mapWidth, int mapHeight, const Texture& texture, sf::Vector2f size)
 	spriteFood.setTexture(texture);
 	spriteDoor.setTexture(texture);
 	spriteMegaFood.setTexture(texture);
+	fruitTexture.loadFromFile("src/Fruit.png");
+	fruitSprite.setTexture(fruitTexture);
 
 	spriteBoard.setTextureRect(IntRect(0, 0, size.x, size.y));
 	spriteFood.setTextureRect(IntRect(size.x, 0, size.x, size.y));
 	spriteDoor.setTextureRect(IntRect(2 * size.x, 0, size.x, size.y));
 	spriteMegaFood.setTextureRect(IntRect(3 * size.x, 0, size.x, size.y));
+	fruitSprite.setTextureRect(IntRect(0, 0, size.x, size.y));
 
 	map =
 	{
@@ -77,6 +80,11 @@ void Map::drawMap(RenderWindow& window)
 			{
 				spriteMegaFood.setPosition(j * size.x, i * size.y);
 				window.draw(spriteMegaFood);
+			}
+			if (map[i][j] == '6')
+			{
+				fruitSprite.setPosition(j * size.x, i * size.y);
+				window.draw(fruitSprite);
 			}
 		}
 	}

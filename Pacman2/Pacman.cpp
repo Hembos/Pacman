@@ -152,6 +152,11 @@ bool Pacman::eatFood(Map& map)
 		score += 10;
 		map.setField('0', cell.x, cell.y);
 	}
+	if (map.getField(cell.x, cell.y) == '6')
+	{
+		score += 10000;
+		map.setField('0', cell.x, cell.y);
+	}
 	if (map.getField(cell.x, cell.y) == '9')
 	{
 		score += 50;

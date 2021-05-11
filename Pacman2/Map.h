@@ -15,6 +15,8 @@ private:
 	sf::Sprite spriteFood;
 	sf::Sprite spriteDoor;
 	sf::Sprite spriteMegaFood;
+	sf::Sprite fruitSprite;
+	sf::Texture fruitTexture;
 	std::vector<std::string> map;
 public:
 	Map(int mapWidth, int mapHeight, const sf::Texture& texture, Vector size);

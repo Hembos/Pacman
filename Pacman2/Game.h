@@ -44,7 +44,9 @@ private:
 
 	sf::Time time;
 	float pastTime;
+	float totalTime;
 	float elapsedTimeEating;
+	int numFruit = 0;
 
 	Targets targets;
 	int countEaten = 0;

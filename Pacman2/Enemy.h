@@ -28,7 +28,5 @@ public:
 	void move(float time) final;
 	BEHAVIOR_MODE getMode() { return mode; }
 	void setMode(BEHAVIOR_MODE mode) { this->mode = mode; }
-	void setNextCell(sf::Vector2i nextCell) { this->nextCell = nextCell; }
-	void setNextDir(DIRECTION dir) { nextDir = dir; }
 	void beginState(const sf::Texture& texture);
 };

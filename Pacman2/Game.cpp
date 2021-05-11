@@ -48,6 +48,7 @@ void Game::renderScene()
 		float pt = time.asMicroseconds();
 		pt /= 1000;
 		pastTime += time.asSeconds();
+		totalTime += time.asSeconds();
 
 		while (window->pollEvent(event))
 		{
@@ -181,6 +182,15 @@ void Game::updateEntities(float pt)
 	{
 		inky->setMode(BEHAVIOR_MODE::leaveHouse);
 	}
+	if (totalTime >= 5 && totalTime <= 10 && numFruit < 2 && map->getField(17, 14) == '0')
+	{
+		map->setField('6', 17, 14);
+		numFruit += 1;
+	}
+	if (totalTime > 10 && map->getField(17, 14) == '6')
+	{
+		map->setField('0', 17, 14);
+	}
 
 	if (pacman->eatFood(*map))
 	{
@@ -253,7 +263,7 @@ void Game::drawScore()
 	}
 
 	std::ostringstream osstr1;
-	osstr1 << pastTime;
+	osstr1 << totalTime;
 	std::string pt = osstr1.str();
 
 	j = 0;

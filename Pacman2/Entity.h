@@ -28,7 +28,6 @@ public:
 	virtual void update(float time, Map& map, sf::Vector2i target = sf::Vector2i(0, 0)) = 0;
 	virtual bool collision(Map& map, sf::Vector2i target = sf::Vector2i(0, 0)) = 0;
 	void draw(sf::RenderWindow& window) { window.draw(sprite); }
-	const Vector& getSize() const { return size; }
 	void changeDelta();
 	virtual void move(float time) = 0;
 	sf::Vector2i getCell();
